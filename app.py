@@ -462,7 +462,7 @@ def show_slide(slide_number):
     slide_data = SLIDES_CONTENT[slide_number]
     total_slides = len(SLIDES_CONTENT)
     
-            return render_template("integrated_slide.html", 
+    return render_template("integrated_slide.html", 
                          slide_number=slide_number,
                          slide_data=slide_data,
                          total_slides=total_slides,
@@ -490,9 +490,9 @@ def show_quiz(slide_number):
     scores = scores_response.data if scores_response.data else []
     
     total_score = sum(score["score"] for score in scores)
-    
+
     quiz_data = SLIDES_CONTENT[slide_number]["quiz"]
-            return render_template("quiz.html", 
+    return render_template("quiz.html", 
                          slide_number=slide_number,
                          quiz_data=quiz_data,
                          slide_title=SLIDES_CONTENT[slide_number]["title"],
