@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Interactive Learning</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-container {
+            padding: 2rem 0;
+        }
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .control-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: 100%;
+        }
+        .control-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        .slide-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .activation-toggle {
+            transform: scale(1.2);
+        }
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border: 1px solid #28a745;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        .status-inactive {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border: 1px solid #dc3545;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        .student-progress-card {
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        .student-progress-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        .stats-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .table-responsive {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .table thead {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        .badge-score {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        .score-excellent { background: linear-gradient(45deg, #28a745, #20c997); color: white; }
+        .score-good { background: linear-gradient(45deg, #ffc107, #fd7e14); color: white; }
+        .score-needs-improvement { background: linear-gradient(45deg, #dc3545, #e83e8c); color: white; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/teacher_dashboard">
+                <i class="fas fa-chalkboard-teacher me-2"></i>Teacher Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/leaderboard">
+                    <i class="fas fa-trophy me-1"></i>Leaderboard
+                </a>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container dashboard-container">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="welcome-card p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="display-6 fw-bold text-primary mb-2">
+                                <i class="fas fa-chalkboard-teacher me-3"></i>Teacher Control Panel
+                            </h1>
+                            <p class="lead text-muted">Manage slide access and monitor student progress</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="stats-card">
+                                <i class="fas fa-users stats-icon"></i>
+                                <h3 class="mb-0 text-primary">{{ total_students }}</h3>
+                                <small class="text-muted">Total Students</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Slide Control Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="welcome-card p-4">
+                    <h3 class="mb-4">
+                        <i class="fas fa-cog text-primary me-2"></i>Slide Control Panel
+                    </h3>
+                    
+                    <div class="row g-4">
+                        {% for slide_num, slide_data in slides_content.items() %}
+                        {% set is_activated = slide_num in activated_slides and activated_slides[slide_num].is_active %}
+                        <div class="col-md-6">
+                            <div class="control-card p-4">
+                                <div class="text-center mb-3">
+                                    <div class="slide-icon">
+                                        {% if slide_num == 1 %}
+                                            <i class="fas fa-globe"></i>
+                                        {% elif slide_num == 2 %}
+                                            <i class="fas fa-microchip"></i>
+                                        {% else %}
+                                            <i class="fas fa-book"></i>
+                                        {% endif %}
+                                    </div>
+                                    <h5 class="fw-bold">Slide {{ slide_num }}: {{ slide_data.title }}</h5>
+                                </div>
+                                
+                                <div class="text-center mb-3">
+                                    {% if is_activated %}
+                                        <span class="status-active">
+                                            <i class="fas fa-check-circle me-1"></i>Active
+                                        </span>
+                                    {% else %}
+                                        <span class="status-inactive">
+                                            <i class="fas fa-times-circle me-1"></i>Inactive
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    {% if is_activated %}
+                                        <button class="btn btn-danger" onclick="toggleSlide({{ slide_num }}, false)">
+                                            <i class="fas fa-lock me-2"></i>Deactivate Slide
+                                        </button>
+                                        <a href="{{ url_for('show_slide', slide_number=slide_num) }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-eye me-2"></i>Preview Slide
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-success" onclick="toggleSlide({{ slide_num }}, true)">
+                                            <i class="fas fa-unlock me-2"></i>Activate Slide
+                                        </button>
+                                        <a href="{{ url_for('show_slide', slide_number=slide_num) }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-eye me-2"></i>Preview Slide
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        <strong>Students completed:</strong> 
+                                        {{ student_progress.values()|selectattr('scores', 'defined')|selectattr('scores.' ~ slide_num)|list|length }}/{{ total_students }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-success" onclick="activateAllSlides()">
+                                    <i class="fas fa-unlock-alt me-2"></i>Activate All Slides
+                                </button>
+                                <button class="btn btn-danger" onclick="deactivateAllSlides()">
+                                    <i class="fas fa-lock me-2"></i>Deactivate All Slides
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Progress Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="welcome-card p-4">
+                    <h3 class="mb-4">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>Student Progress Overview
+                    </h3>
+                    
+                    {% if student_progress %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th class="text-center">Total Score</th>
+                                    <th class="text-center">Completed Slides</th>
+                                    <th class="text-center">Slide 1</th>
+                                    <th class="text-center">Slide 2</th>
+                                    <th class="text-center">Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student_id, progress in student_progress.items() %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                                                {{ progress.email[0].upper() }}
+                                            </div>
+                                            <div>
+                                                <strong>{{ progress.email.split('@')[0] }}</strong>
+                                                <small class="d-block text-muted">{{ progress.email.split('@')[1] }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-score {% if progress.total_score >= 160 %}score-excellent{% elif progress.total_score >= 120 %}score-good{% else %}score-needs-improvement{% endif %}">
+                                            {{ progress.total_score|round|int }}%
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong>{{ progress.completed_slides }}</strong> / {{ slides_content|length }}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if 1 in progress.scores %}
+                                            <span class="badge {% if progress.scores[1] >= 80 %}bg-success{% elif progress.scores[1] >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ progress.scores[1]|round|int }}%
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Not taken</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if 2 in progress.scores %}
+                                            <span class="badge {% if progress.scores[2] >= 80 %}bg-success{% elif progress.scores[2] >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ progress.scores[2]|round|int }}%
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Not taken</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center" style="width: 120px;">
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill {% if progress.total_score >= 160 %}bg-success{% elif progress.total_score >= 120 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                 style="width: {{ (progress.completed_slides / slides_content|length * 100)|round }}%;"></div>
+                                        </div>
+                                        <small class="text-muted">{{ (progress.completed_slides / slides_content|length * 100)|round }}%</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3 text-muted">No students enrolled yet</h4>
+                        <p class="text-muted">Student progress will appear here once they start taking quizzes.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <i class="fas fa-play stats-icon"></i>
+                    <h4 class="mb-0 text-primary">{{ activated_slides.values()|selectattr('is_active')|list|length }}</h4>
+                    <small class="text-muted">Active Slides</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <i class="fas fa-user-graduate stats-icon"></i>
+                    <h4 class="mb-0 text-primary">{{ student_progress.values()|selectattr('completed_slides', 'ge', 1)|list|length }}</h4>
+                    <small class="text-muted">Active Students</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <i class="fas fa-trophy stats-icon"></i>
+                    <h4 class="mb-0 text-primary">
+                        {% if student_progress %}
+                            {{ (student_progress.values()|sum(attribute='total_score') / student_progress|length)|round|int }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h4>
+                    <small class="text-muted">Class Average</small>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card">
+                    <i class="fas fa-medal stats-icon"></i>
+                    <h4 class="mb-0 text-primary">{{ student_progress.values()|selectattr('total_score', 'ge', 160)|list|length }}</h4>
+                    <small class="text-muted">Excellent Students</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle individual slide activation
+        function toggleSlide(slideNumber, activate) {
+            const action = activate ? 'activate' : 'deactivate';
+            
+            if (confirm(`Are you sure you want to ${action} Slide ${slideNumber}?`)) {
+                fetch('/activate_slide', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        slide_number: slideNumber,
+                        is_active: activate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        // Reload page to update UI
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showNotification('Error: ' + data.error, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Failed to update slide activation', 'danger');
+                });
+            }
+        }
+
+        // Activate all slides
+        function activateAllSlides() {
+            if (confirm('Are you sure you want to activate ALL slides? This will make all content available to students.')) {
+                const promises = [];
+                {% for slide_num in slides_content.keys() %}
+                promises.push(
+                    fetch('/activate_slide', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ slide_number: {{ slide_num }}, is_active: true })
+                    })
+                );
+                {% endfor %}
+                
+                Promise.all(promises)
+                .then(() => {
+                    showNotification('All slides activated successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                })
+                .catch(error => {
+                    showNotification('Error activating slides', 'danger');
+                });
+            }
+        }
+
+        // Deactivate all slides
+        function deactivateAllSlides() {
+            if (confirm('Are you sure you want to deactivate ALL slides? This will lock all content for students.')) {
+                const promises = [];
+                {% for slide_num in slides_content.keys() %}
+                promises.push(
+                    fetch('/activate_slide', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ slide_number: {{ slide_num }}, is_active: false })
+                    })
+                );
+                {% endfor %}
+                
+                Promise.all(promises)
+                .then(() => {
+                    showNotification('All slides deactivated successfully!', 'warning');
+                    setTimeout(() => window.location.reload(), 1000);
+                })
+                .catch(error => {
+                    showNotification('Error deactivating slides', 'danger');
+                });
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                border-radius: 8px;
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Auto-refresh every 60 seconds to update student progress
+        setInterval(() => {
+            if (!document.hidden) {
+                window.location.reload();
+            }
+        }, 60000);
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        document.querySelector('[onclick*="toggleSlide(1"]').click();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        document.querySelector('[onclick*="toggleSlide(2"]').click();
+                        break;
+                    case 'a':
+                        e.preventDefault();
+                        activateAllSlides();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        deactivateAllSlides();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
